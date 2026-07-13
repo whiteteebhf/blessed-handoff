@@ -4,6 +4,31 @@ You're deep in a working session and the context window is nearly full — or yo
 
 Thirty seconds after typing `/handoff`, a new tab opens, a fresh Claude reads the doc, writes a three-line acknowledgment, and continues your work — with none of your session's context rot and all of its state.
 
+## What it looks like
+
+```text
+you › /handoff
+
+⏺ Handoff — writing docs/HANDOFF-checkout-refactor-2026-07-13.md
+  · ground truth: branch feat/checkout-v2 @ 4f9c2ae · tests: 2 passed, 1 failed
+  · doc written — header next_action: "Fix the stale idempotency test…"
+⏺ Resumability gate — spawning a cold reader with zero session context…
+  · cold-reader self-test: PASS — successor will: fix the stale idempotency test
+⏺ Spawning successor tab (wezterm) — pane 2
+
+────────────────────────────── new tab ──────────────────────────────
+
+⏺ Fresh Claude: reads docs/HANDOFF-checkout-refactor-2026-07-13.md
+  · re-verify: make test → 2 passed, 1 failed ✓ matches the doc
+  · ACK written → .handoff-ack-checkout-refactor-2026-07-13.txt
+
+  "Picking up the checkout refactor — I'll fix the idempotency test to
+   match the new fulfillment-time capture and get the suite green. The
+   capture-timing diff is queued for your review before any deploy."
+```
+
+*(Illustrative transcript — a screen recording is coming shortly. The successor really does open in a new terminal tab.)*
+
 ## The idea that makes it work: resumability is measured, not assumed
 
 Most handoff/summary prompts hope the summary is good enough. This skill **tests** it: before delivery, it spawns one throwaway subagent with zero session context, gives it only the doc, and asks it three questions — *what's the single next action, what's your first reply to the user, and what can't you resolve from this file alone?* If the cold reader picks the wrong action or hits an unresolvable term, the doc gets one bounded revise pass and is re-tested. The doc ships exactly as long as it needs to be to pass — no longer.
