@@ -1,0 +1,9 @@
+{
+  "name": "handoff",
+  "description": "Cold-resumable session handoffs: a dated handoff doc with a measured resumability gate, delivered to a fresh Claude instance primed to pick up the thread.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/whiteteebhf/blessed-handoff-skill",
+  "repository": "https://github.com/whiteteebhf/blessed-handoff-skill",
+  "keywords": ["handoff", "context", "compaction", "session", "resume"]
+}
