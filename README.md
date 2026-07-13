@@ -1,4 +1,4 @@
-# handoff — cold-resumable session handoffs for Claude Code
+# blessed-handoff — cold-resumable session handoffs for Claude Code
 
 You're deep in a working session and the context window is nearly full — or you need to step away, switch machines, or hand the thread to tomorrow-you. `/handoff` writes a dated, self-contained handoff doc capturing exactly where the work stands (the next action, the tripwires, the unverified hunches, the settled decisions), **proves a cold reader can resume from it**, then spawns a fresh Claude instance in a new terminal tab already primed to pick up the thread.
 
@@ -22,8 +22,8 @@ See [`examples/HANDOFF-checkout-refactor-2026-07-13.md`](examples/HANDOFF-checko
 **Option A — bare skill (simplest):**
 
 ```bash
-git clone https://github.com/whiteteebhf/blessed-handoff-skill.git
-cp -r blessed-handoff-skill/skills/handoff ~/.claude/skills/handoff
+git clone https://github.com/whiteteebhf/blessed-handoff.git
+cp -r blessed-handoff/skills/handoff ~/.claude/skills/handoff
 ```
 
 Then `/handoff` is available in every Claude Code session.
@@ -31,11 +31,11 @@ Then `/handoff` is available in every Claude Code session.
 **Option B — as a plugin:**
 
 ```
-/plugin marketplace add whiteteebhf/blessed-handoff-skill
-/plugin install handoff@blessed-handoff-skill
+/plugin marketplace add whiteteebhf/blessed-handoff
+/plugin install blessed-handoff@blessed-handoff
 ```
 
-Note: plugin-installed skills are namespaced (`/handoff:handoff`); the bare-skill install gives you the shorter `/handoff`.
+Note: plugin-installed skills are namespaced (`/blessed-handoff:handoff`); the bare-skill install gives you the shorter `/handoff`.
 
 ## Usage
 

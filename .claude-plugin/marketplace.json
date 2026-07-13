@@ -1,10 +1,10 @@
 {
-  "name": "blessed-handoff-skill",
+  "name": "blessed-handoff",
   "description": "Cold-resumable session handoffs for Claude Code — dated handoff docs with a measured resumability gate, delivered to a fresh primed instance.",
   "owner": { "name": "whiteteebhf" },
   "plugins": [
     {
-      "name": "handoff",
+      "name": "blessed-handoff",
       "source": "./",
       "description": "Cold-resumable session handoffs with a measured resumability gate."
     }
