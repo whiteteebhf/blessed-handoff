@@ -65,7 +65,6 @@ Known constraint: some GUI terminals can't be scripted at all (e.g. macOS Access
 ## Optional extras
 
 - **PreCompact seatbelt** — a small opt-in hook that snapshots mechanical state to disk just before Claude Code *auto*-compacts, so an unplanned compaction never costs you the thread. Deliberately **not** auto-installed by the plugin (a hook that writes into your repos should be your decision): recipe in [`docs/seatbelt.md`](docs/seatbelt.md).
-- **Telegram transport adapter** — for setups that drive Claude Code from a phone via a Telegram↔tmux bridge (bridge not included): [`adapters/telegram/`](adapters/telegram/).
 
 ## License
 
