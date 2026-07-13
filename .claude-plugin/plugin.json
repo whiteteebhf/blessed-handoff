@@ -3,6 +3,7 @@
   "description": "Cold-resumable session handoffs: a dated handoff doc with a measured resumability gate, delivered to a fresh Claude instance primed to pick up the thread.",
   "version": "1.0.0",
   "license": "MIT",
+  "author": { "name": "@WhiteTeeBHF (BHFMC LLC)" },
   "homepage": "https://github.com/whiteteebhf/blessed-handoff",
   "repository": "https://github.com/whiteteebhf/blessed-handoff",
   "keywords": ["handoff", "context", "compaction", "session", "resume"]
