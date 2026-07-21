@@ -49,9 +49,10 @@ See [`examples/HANDOFF-checkout-refactor-2026-07-13.md`](examples/HANDOFF-checko
 ```bash
 git clone https://github.com/whiteteebhf/the-blessed-handoff.git
 cp -r the-blessed-handoff/skills/handoff ~/.claude/skills/handoff
+cp -r the-blessed-handoff/skills/handoff-resume ~/.claude/skills/handoff-resume   # optional pickup side
 ```
 
-Then `/handoff` is available in every Claude Code session.
+Then `/handoff` is available in every Claude Code session. The second copy is `handoff-resume`, the companion pickup skill — it lets ANY fresh session (any harness, any machine) pick up a handoff doc by path, without the auto-spawn machinery. On other harnesses, copy it into that harness's own skills directory instead of `~/.claude/skills/`.
 
 **Option B — as a plugin:**
 
@@ -71,8 +72,11 @@ Note: plugin-installed skills are namespaced (`/the-blessed-handoff:handoff`); t
 | `/handoff --no-spawn` | Doc + gate only; no delivery |
 | `/handoff --panic` | Minimal fast-path doc for when context is nearly gone |
 | `/handoff --transport file-only` | Write the doc, print the manual spawn command |
+| `/handoff-resume docs/HANDOFF-….md` | Companion skill: pick up a handoff doc from any fresh session — re-verifies state, writes the ACK, continues the work |
 
 Claude will also *propose* a handoff at sensible moments (before `/compact` with non-trivial work in flight, at natural breaks in long sessions) — once, and it won't pester if declined.
+
+Note: `/handoff` boots a **live agent that immediately runs the doc's re-verify checks** (tests, git, deploy status). Irreversible actions stay user-gated via the tripwires, but if you'd rather review the doc before anything runs, use `--no-spawn`.
 
 ## Compatibility
 
@@ -82,14 +86,19 @@ Honest labels — "tested" means used in real work, not that a CI matrix exists:
 |---|---|
 | Claude Code · macOS · WezTerm auto-spawn | **Tested** (daily use) |
 | Claude Code · file-only fallback | **Tested** (daily use) |
-| tmux / kitty / iTerm2 / Windows Terminal auto-spawn | Should work, **untested** — spawn failure falls through to file-only by design |
-| Other harnesses (anything that can read/write files) | The doc contract itself is harness-agnostic; delivery and the subagent gate degrade as documented. **Untested.** |
+| tmux / kitty / iTerm2 / Windows Terminal auto-spawn | Should work, **untested** — spawn failure falls through to file-only by design. Windows Terminal assumes WSL/MSYS; the skill's shell commands are POSIX throughout |
+| Other harnesses (anything that can read/write files) | The doc contract itself is harness-agnostic; Step 0's harness profile parameterizes the successor command, the subagent gate, and the task list, and delivery degrades as documented. The `handoff-resume` companion skill is the harness-neutral pickup path. **Untested.** |
 
-Known constraint: some GUI terminals can't be scripted at all (e.g. macOS Accessibility can block automation of Apple Terminal) — that's what the detect-checks and file-only baseline are for.
+Known constraints:
+- Some GUI terminals can't be scripted at all (e.g. macOS Accessibility can block automation of Apple Terminal, and iTerm2-via-osascript needs an Automation/Apple Events consent that fails opaquely on first run) — that's what the detect-checks and file-only baseline are for.
+- "Switch machines" carries **committed state only**. The doc references local branches, uncommitted work, and absolute paths; the re-verify steps will fail on another machine unless the checkout matches. Treat cross-machine resume as "same repo, same commit, then re-verify."
 
 ## Optional extras
 
-- **PreCompact seatbelt** — a small opt-in hook that snapshots mechanical state to disk just before Claude Code *auto*-compacts, so an unplanned compaction never costs you the thread. Deliberately **not** auto-installed by the plugin (a hook that writes into your repos should be your decision): recipe in [`docs/seatbelt.md`](docs/seatbelt.md).
+- **`handoff-resume` pickup skill** (`skills/handoff-resume/`) — the successor side of the contract as a standalone skill: point any fresh session at a handoff doc and it re-verifies state, writes the ACK, and continues. This is the natural pickup path for other harnesses, other machines, and terminals where auto-spawn doesn't work.
+- **PreCompact seatbelt** — a small opt-in hook that snapshots mechanical state to disk just before Claude Code *auto*-compacts, so an unplanned compaction never costs you the thread. Deliberately **not** auto-installed by the plugin (a hook that writes into your repos should be your decision): recipe in [`docs/seatbelt.md`](docs/seatbelt.md). Autosave snapshots accumulate — prune `HANDOFF-AUTOSAVE-*` occasionally; they're safe to delete.
+- **Writing a transport adapter?** (Telegram, Slack, …) — the adapter contract lives in [`docs/adapters.md`](docs/adapters.md).
+- **Contributing** — CI runs shellcheck on the hook, fixture tests for the PreCompact payload parsing, and a frontmatter parse of the example doc. Run them locally with `tests/run-tests.sh` and `tests/check-docs.py`.
 
 ## License
 

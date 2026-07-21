@@ -1,14 +1,14 @@
 ---
-handoff: checkout-refactor
-date: 2026-07-13 16:42 CDT
-project: acme-storefront
-branch: feat/checkout-v2
-head_sha: 4f9c2ae
-validity: until the next push to feat/checkout-v2
-supersedes: HANDOFF-checkout-refactor-2026-07-11.md
-chain: 3 of 3
-next_action: Fix the failing idempotency-key test in tests/payments/test_capture.py (see §Resume point) and get the suite back to green before touching the webhook branch.
-do_not: Do NOT deploy to staging or merge feat/checkout-v2 until the user has reviewed the Stripe capture-timing change.
+handoff: "checkout-refactor"
+date: "2026-07-13 16:42 CDT"
+project: "acme-storefront"
+branch: "feat/checkout-v2"
+head_sha: "4f9c2ae"
+validity: "until the next push to feat/checkout-v2"
+supersedes: "HANDOFF-checkout-refactor-2026-07-11.md"
+chain: "3 of 3"
+next_action: "Fix the failing idempotency-key test in tests/payments/test_capture.py (see §Resume point) and get the suite back to green before touching the webhook branch."
+do_not: "Do NOT deploy to staging or merge feat/checkout-v2 until the user has reviewed the Stripe capture-timing change."
 open_tasks: 4
 ---
 

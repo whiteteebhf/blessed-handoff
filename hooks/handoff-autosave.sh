@@ -20,17 +20,20 @@ set -uo pipefail
 input="$(cat 2>/dev/null)"
 
 # --- parse stdin JSON ---
-read -r cwd trigger < <(
-  printf '%s' "$input" | python3 -c '
-import sys, json
+# Emit shlex-quoted assignments and eval them. A space-separated `read` would
+# split a cwd containing spaces mid-path (trigger then never matches "auto"
+# and the hook silently no-ops); shlex.quote keeps the eval safe.
+eval "$(printf '%s' "$input" | python3 -c '
+import sys, json, shlex
 try:
     d = json.load(sys.stdin)
 except Exception:
     d = {}
-print(d.get("cwd", ""), d.get("trigger", ""))
-' 2>/dev/null
-)
+print("cwd=" + shlex.quote(str(d.get("cwd", ""))))
+print("trigger=" + shlex.quote(str(d.get("trigger", ""))))
+' 2>/dev/null)"
 [ -z "${cwd:-}" ] && cwd="$PWD"
+[ -z "${trigger:-}" ] && trigger=""
 
 # --- only act on AUTO compaction ---
 if [ "${trigger:-}" != "auto" ]; then
@@ -48,7 +51,10 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 ts="$(date +%Y-%m-%d-%H%M%S)"
-docdir="docs"; [ -d "$docdir" ] || docdir="."
+# Match the skill's Step 1 contract: inside a git repo, docs/ is created if absent.
+docdir="docs"
+[ -d "$docdir" ] || mkdir -p "$docdir" 2>/dev/null
+[ -d "$docdir" ] || docdir="."
 out="$docdir/HANDOFF-AUTOSAVE-$ts.md"
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
 head="$(git rev-parse --short HEAD 2>/dev/null || echo '?')"

@@ -45,6 +45,8 @@ Claude Code auto-enables hooks that a plugin declares in its manifest. A hook th
 
 Requirements: `bash`, `git`, and a `python3` on PATH (used only to parse the hook's JSON payload; present by default on macOS and most Linux distros).
 
+Housekeeping: `HANDOFF-AUTOSAVE-*` snapshots accumulate over time. Prune them occasionally — they're mechanical state, never part of the canonical chain, and safe to delete.
+
 ## Uninstall
 
 Delete the script and remove the `PreCompact` entry from `~/.claude/settings.json`. That's it — the hook keeps no other state.
