@@ -31,6 +31,9 @@ jobs:
         run: bash tests/run-tests.sh
 
       - name: Frontmatter and manifest checks
+        # venv sidesteps PEP 668 (macOS runners ship a brew-managed Python
+        # that refuses bare pip installs with externally-managed-environment)
         run: |
-          python3 -m pip install --quiet pyyaml
-          python3 tests/check-docs.py
+          python3 -m venv .ci-venv
+          .ci-venv/bin/python -m pip install --quiet pyyaml
+          .ci-venv/bin/python tests/check-docs.py

@@ -83,7 +83,11 @@ head="$(git rev-parse --short HEAD 2>/dev/null || echo '?')"
   echo
   echo "## Existing handoff docs in this project"
   echo '```'
-  ls -1 "$docdir"/HANDOFF-*.md 2>/dev/null | grep -v AUTOSAVE | tail -10
+  for f in "$docdir"/HANDOFF-*.md; do
+    [ -e "$f" ] || continue
+    case "$f" in *HANDOFF-AUTOSAVE-*) continue ;; esac
+    printf '%s\n' "$f"
+  done | tail -10
   echo '```'
 } > "$out" 2>/dev/null || { nudge "Context auto-compacting — run /handoff to capture state (autosave write failed)."; exit 0; }
 
