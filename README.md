@@ -54,6 +54,11 @@ cp -r the-blessed-handoff/skills/handoff-resume ~/.claude/skills/handoff-resume 
 
 Then `/handoff` is available in every Claude Code session. The second copy is `handoff-resume`, the companion pickup skill — it lets ANY fresh session (any harness, any machine) pick up a handoff doc by path, without the auto-spawn machinery. On other harnesses, copy it into that harness's own skills directory instead of `~/.claude/skills/`.
 
+Harness install notes:
+
+- **Codex CLI** — install to `~/.codex/skills/`. Codex treats **every subdirectory** of that folder as a skill, so keep backups (e.g. `handoff.bak-*`) outside it or they register as duplicates. When upgrading an existing install, preserve any `agents/openai.yaml` metadata alongside `SKILL.md`.
+- **Kimi Code CLI** — install to `$KIMI_CODE_HOME/skills/` (default `~/.kimi-code/skills/`). If you run Kimi with an isolated `KIMI_CODE_HOME`, export it in any spawned successor shell or the fresh instance won't see the skills.
+
 **Option B — as a plugin:**
 
 ```
@@ -86,8 +91,10 @@ Honest labels — "tested" means used in real work, not that a CI matrix exists:
 |---|---|
 | Claude Code · macOS · WezTerm auto-spawn | **Tested** (daily use) |
 | Claude Code · file-only fallback | **Tested** (daily use) |
+| Kimi Code CLI · macOS · WezTerm auto-spawn + headless (`kimi -p`) pickup | **Tested** (2026-07-22, v1.1.0) — both skills install unmodified at `$KIMI_CODE_HOME/skills/`; doc write, cold-reader gate, wezterm successor spawn, and ACK pickup verified end-to-end |
+| Codex CLI · headless (`codex exec`) | **Tested** (2026-07-22, v1.1.0) — install to `~/.codex/skills/`; auto-discovered with no flags; doc write and `handoff-resume` pickup verified in both directions against Kimi |
 | tmux / kitty / iTerm2 / Windows Terminal auto-spawn | Should work, **untested** — spawn failure falls through to file-only by design. Windows Terminal assumes WSL/MSYS; the skill's shell commands are POSIX throughout |
-| Other harnesses (anything that can read/write files) | The doc contract itself is harness-agnostic; Step 0's harness profile parameterizes the successor command, the subagent gate, and the task list, and delivery degrades as documented. The `handoff-resume` companion skill is the harness-neutral pickup path. **Untested.** |
+| Other harnesses (anything that can read/write files) | The doc contract itself is harness-agnostic; Step 0's harness profile parameterizes the successor command, the subagent gate, and the task list, and delivery degrades as documented. The `handoff-resume` companion skill is the harness-neutral pickup path. Beyond Kimi and Codex (above), **untested.** |
 
 Known constraints:
 - Some GUI terminals can't be scripted at all (e.g. macOS Accessibility can block automation of Apple Terminal, and iTerm2-via-osascript needs an Automation/Apple Events consent that fails opaquely on first run) — that's what the detect-checks and file-only baseline are for.

@@ -226,6 +226,10 @@ Worked example (**wezterm**):
 wezterm cli spawn --cwd "<CWD>" -- "$SHELL" -c 'export PATH="<current session PATH>"; "<SUCC absolute path>" "$(cat "<prompt file path>")" && rm -f "<prompt file path>"; exec "$SHELL"'
 ```
 
+Successor-CLI invocation notes:
+
+- **Kimi (`kimi`)** — pass the prompt with `-p`: `kimi -p "$(cat "<prompt file path>")"`. Do NOT add `-y`/`--yolo` or `--auto`: current versions reject those flags in combination with `-p`, and prompt mode already approves tool calls under its own defaults. Also export `KIMI_CODE_HOME` in the spawned shell if it is set in yours — otherwise the successor won't see the installed skills.
+
 Other transports follow the same shape — new tab/window at `<CWD>`, run the successor binary with the prompt file's contents, keep the shell alive afterward:
 
 - **tmux**: `tmux new-window -c "<CWD>" "$SHELL" -c '<same inner command>'`
