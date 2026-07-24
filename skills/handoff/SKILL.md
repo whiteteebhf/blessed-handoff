@@ -48,6 +48,7 @@ Every spawn shape assumes a POSIX environment (`$SHELL`, `mktemp`, `command -v`)
 **Harness profile** — fill in once here, reference everywhere below. This is what makes the skill portable across harnesses; do not re-derive these ad hoc later.
 
 - **`SUCCESSOR_CMD`** — the interactive CLI the successor runs. Default `claude`; on another harness, that harness's own CLI (e.g. `codex`, `gemini`, `kimi`). Step 4b spawns this.
+- **`PROMPT_STYLE`** — how the successor CLI accepts its first prompt. `positional` (default; e.g. `claude "<prompt>"`): Step 4b passes the prompt file's contents as a positional argument. `skill-command` (Kimi Code CLI): the CLI has no positional prompt arg — spawn the interactive CLI bare, then deliver `/handoff-resume <absolute doc path>` as the first TUI input (see the skill-command worked example in Step 4b); the pickup instructions then come from the installed `handoff-resume` skill, and the mktemp prompt file is unnecessary (still write it if another harness might consume it).
 - **`HAS_SUBAGENTS`** — can you spawn a subagent (e.g. Claude Code's Agent tool)? Gates the Step 3.5b cold-reader self-test.
 - **`HAS_TASK_LIST`** — does the harness expose a task-list tool (e.g. `TaskList` in Claude Code)? Gates the Step 2 task capture and the §Tasks snapshot section.
 
@@ -220,15 +221,25 @@ Make the spawned shell look like the current session — a bare absolute path is
 
 Use the user's own shell (`$SHELL`), not a hardcoded one.
 
-Worked example (**wezterm**):
+Worked example (**wezterm**, `PROMPT_STYLE=positional`):
 
 ```
 wezterm cli spawn --cwd "<CWD>" -- "$SHELL" -c 'export PATH="<current session PATH>"; "<SUCC absolute path>" "$(cat "<prompt file path>")" && rm -f "<prompt file path>"; exec "$SHELL"'
 ```
 
+Worked example (**wezterm**, `PROMPT_STYLE=skill-command` — Kimi Code CLI):
+
+```
+wezterm cli spawn --cwd "<CWD>" -- "$SHELL" -c 'export PATH="<current session PATH>"; "<SUCC absolute path>"; exec "$SHELL"'
+# then, once the TUI is up (wait ≥8s — submissions during boot can be swallowed):
+wezterm cli send-text --pane-id <pane id> '/handoff-resume <absolute doc path>'
+wezterm cli send-text --pane-id <pane id> $'\r'   # submit = Enter (\x0d), sent separately
+```
+
 Successor-CLI invocation notes:
 
-- **Kimi (`kimi`)** — pass the prompt with `-p`: `kimi -p "$(cat "<prompt file path>")"`. Do NOT add `-y`/`--yolo` or `--auto`: current versions reject those flags in combination with `-p`, and prompt mode already approves tool calls under its own defaults. Also export `KIMI_CODE_HOME` in the spawned shell if it is set in yours — otherwise the successor won't see the installed skills.
+- **Kimi Code CLI (`kimi`, `PROMPT_STYLE=skill-command`)** — the CLI has **no positional prompt argument** (`kimi "<prompt>"` errors with "unknown command"), and `-p` is **one-shot, non-interactive** mode (`kimi -p "<prompt>"` runs one prompt, prints, and exits) — suitable only if you deliberately want the pickup to run unattended to completion. For an interactive successor, spawn the interactive CLI bare, wait ≥8s for the TUI to finish booting, then deliver `/handoff-resume <absolute doc path>` as the first input (see the skill-command worked example above; the submit key is Enter = `\x0d`, sent separately — Ctrl-J/`\x0a` only inserts a newline). Also export `KIMI_CODE_HOME` in the spawned shell if it is set in yours — otherwise the successor won't see the installed skills.
+- **Claude (`claude`, `PROMPT_STYLE=positional`)** — the default worked examples apply unchanged: `claude "$(cat "<prompt file path>")"`.
 
 Other transports follow the same shape — new tab/window at `<CWD>`, run the successor binary with the prompt file's contents, keep the shell alive afterward:
 
